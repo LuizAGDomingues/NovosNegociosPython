@@ -2,25 +2,18 @@ import json
 import os
 from datetime import datetime
 
-import pywhatkit  # type: ignore
-import requests  # type: ignore
-from dotenv import load_dotenv
-
-# Carrega as variáveis de ambiente do arquivo .env
-load_dotenv()
+import pytz
+import pywhatkit
+import requests
 
 # Configurações
-API_KEY = os.getenv('PIPEDRIVE_API_KEY')
-FILTER_ID = os.getenv('PIPEDRIVE_FILTER_ID')
-WHATSAPP_RECIPIENT = os.getenv('WHATSAPP_RECIPIENT')
+API_KEY = "SUA_API_KEY_DO_PIPEDRIVE"
+FILTER_ID = "ID_DO_SEU_FILTRO"
+WHATSAPP_RECIPIENT = "NUMERO_DO_COLEGA"  # Formato internacional, ex: 5511999999999
 STORAGE_FILE = "sent_ids.json"
 
-# Validação das variáveis de ambiente
-if not all([API_KEY, FILTER_ID, WHATSAPP_RECIPIENT]):
-    raise ValueError("As variáveis de ambiente necessárias não estão configuradas.")
-
 def get_pipedrive_deals():
-    url = f"https://poloarbauru2.pipedrive.com/api/v1/deals?api_token={API_KEY}&filter_id={FILTER_ID}"
+    url = f"https://api.pipedrive.com/v1/deals?api_key={API_KEY}&filter_id={FILTER_ID}"
     response = requests.get(url)
     response.raise_for_status()
     return response.json()['data']
@@ -48,7 +41,8 @@ def send_whatsapp_message(message):
         pywhatkit.sendwhatmsg_instantly(
             numero_formatado,
             message,
-            wait_time=20,  # Tempo de espera em segundos
+            wait_time=60,  # Tempo de espera em segundos
+            tab_close=True  # Fecha a aba após enviar
         )
         print(f"Mensagem enviada com sucesso para {numero_formatado}")
     except Exception as e:
@@ -69,17 +63,16 @@ def main():
     new_ids = current_ids - sent_ids
 
     if not new_ids:
-        print("Nenhum novo ID dos negócios acima de R$15k encontrado.")
-        message = f"Nenhum novo ID dos negócios acima de R$15k encontrado."
-        send_whatsapp_message(message)
+        print("Nenhum novo ID encontrado.")
         return
+
     # Construir mensagem
     if len(sent_ids) > 0:
-        message = f"Além dos {last_count} IDs dos negócios acima de R$15k informados anteriormente, seguem os outros IDs:\n"
+        message = f"Além dos {last_count} informados anteriormente, seguem os outros IDs:\n"
         message += ", ".join(map(str, new_ids))
         new_count = len(new_ids)
     else:
-        message = "IDs dos negócios acima de R$15k encontrados:\n"
+        message = "IDs encontrados:\n"
         message += ", ".join(map(str, new_ids))
         new_count = len(new_ids)
 

@@ -2,8 +2,8 @@ import json
 import os
 from datetime import datetime
 
-import pywhatkit  # type: ignore
-import requests  # type: ignore
+import pywhatkit # type: ignore
+import requests # type: ignore
 from dotenv import load_dotenv
 
 # Carrega as variáveis de ambiente do arquivo .env

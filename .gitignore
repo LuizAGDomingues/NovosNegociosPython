@@ -1,0 +1,21 @@
+# Arquivos de ambiente
+.env
+.env.*
+
+# Arquivos de cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos de armazenamento local
+sent_ids.json
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db 
